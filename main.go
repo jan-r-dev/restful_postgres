@@ -49,6 +49,7 @@ func main() {
 	var choice string
 	fmt.Scanln(&choice)
 
+	// Should be separate func that returns rows instead
 	var rows pgx.Rows
 	var bs [][]byte
 	if choice == "a" {
@@ -59,6 +60,7 @@ func main() {
 		rows = queryArticle(conn, c, querystringProject)
 		bs = rowsProject(rows)
 	}
+	// Separate func end
 
 	defer rows.Close()
 
