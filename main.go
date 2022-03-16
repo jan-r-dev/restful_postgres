@@ -32,6 +32,7 @@ inner join title on project.title_fk = title.pk
 // TO DO
 /*
 1/ Create project struct
+2/ Examine the option of employing a sort of manifest that would allow for dynamic struct assignment in the row read
 2/ Create functions for
 	Querying project
 	Processing project rows
