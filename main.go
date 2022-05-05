@@ -1,63 +1,81 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"os"
-
-	"github.com/jackc/pgx/v4"
+	"reflect"
 )
 
 type article struct {
-	Pk           int      `json:"pk,omitempty"`
-	Title        string   `json:"title,omitempty"`
-	Text_content []string `json:"text,omitempty"`
-	Image_url    []string `json:"images,omitempty"`
-	Snippet_url  []string `json:"snippets,omitempty"`
-	Source_url   []string `json:"sources,omitempty"`
+	Pk           int      `sql:"pk"`
+	Title        string   `sql:"title"`
+	Text_content []string `sql:"text"`
+	Image_url    []string `sql:"images"`
+	Snippet_url  []string `sql:"snippets"`
+	Source_url   []string `sql:"sources"`
 }
 
-func postgres(ctx context.Context, articleID string) (article, error) {
-	qs := "select article.pk, title, text_content, image_url, snippet_url, source_url from article inner join title on article.title_fk = title.pk where article.pk = " + articleID
-
-	article := article{}
-
-	conn, errConn := pgx.Connect(ctx, os.Getenv("POSTGRES_DB"))
-	if errConn != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", errConn)
-		conn.Close(ctx)
-		return article, errConn
-	}
-	defer conn.Close(ctx)
-
-	rows, errQuery := conn.Query(ctx, qs)
-	if errQuery != nil {
-		fmt.Fprintf(os.Stderr, "Error while executing query: %v\n", errQuery)
-		rows.Close()
-		return article, errQuery
-	}
-	defer rows.Close()
-
-	return readRowsArticle(rows)
-}
-
-func readRowsArticle(rows pgx.Rows) (article, error) {
+func main() {
 	a := article{}
-	for rows.Next() {
 
-		errScan := rows.Scan(
-			&a.Pk,
-			&a.Title,
-			&a.Text_content,
-			&a.Image_url,
-			&a.Snippet_url,
-			&a.Source_url,
-		)
-		if errScan != nil {
-			fmt.Fprintf(os.Stderr, "Error while scanning rows: %v\n", errScan)
-			return a, errScan
+	/*
+		ctx := context.Background()
+
+		conn, err := pgx.Connect(ctx, os.Getenv("POSTGRES_DB"))
+		if err != nil {
+			conn.Close(ctx)
 		}
-	}
+		defer conn.Close(ctx)
 
-	return a, nil
+		qs := "select pk, title, text_content, image_url, snippet_url, source_url from article where pk = 1"
+		rows, err := conn.Query(ctx, qs)
+		if err != nil {
+			rows.Close()
+		}
+		defer rows.Close()
+
+	*/
+
+	// Next step: Attempted to assign to the fields as per reflection
+	fileType := reflect.TypeOf(a)
+	fmt.Println(fileType)
+
+	//readRows(a)
+}
+
+func unveilStruct(str interface{}) {
+	fileType := reflect.TypeOf(str)
+	fmt.Println(fileType)
+
+	/*
+		fs := reflect.VisibleFields(fileType)
+
+		for i, el := range fs {
+			fmt.Println(i, el.Name)
+		}
+		fmt.Println(len(fs))
+	*/
+}
+
+func readRows(str interface{}) error {
+	fileType := reflect.TypeOf(str)
+	fmt.Println(fileType)
+
+	/*
+		for rows.Next() {
+			errScan := rows.Scan(
+				&a.Pk,
+				&a.Title,
+				&a.Text,
+				&a.Image_url,
+				&a.Snippet_url,
+				&a.Source_url,
+			)
+			if errScan != nil {
+				fmt.Fprintf(os.Stderr, "Error while scanning rows in the Article table: %v\n", errScan)
+				return a, errScan
+			}
+		}
+	*/
+
+	return nil
 }
