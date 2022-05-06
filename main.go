@@ -14,8 +14,28 @@ type article struct {
 	Source_url   []string `sql:"sources"`
 }
 
+type fakeRow struct {
+	one   int
+	two   string
+	three []string
+	four  []string
+	five  []string
+	six   []string
+	seven []string
+}
+
 func main() {
 	a := article{}
+
+	fakerows := []fakeRow{{
+		one:   1,
+		two:   "hello",
+		three: []string{"three1", "three2"},
+		four:  []string{"four1", "four2"},
+		five:  []string{"five1", "five2"},
+		six:   []string{"six1", "six2"},
+		seven: []string{"seven1", "seven2"},
+	}}
 
 	/*
 		ctx := context.Background()
@@ -35,33 +55,27 @@ func main() {
 
 	*/
 
-	// Next step: Attempted to assign to the fields as per reflection
-	fileType := reflect.TypeOf(a)
-	fmt.Println(fileType)
+	readRows(&a, fakerows)
 
 	//readRows(a)
 }
 
-func unveilStruct(str interface{}) {
-	fileType := reflect.TypeOf(str)
-	fmt.Println(fileType)
+func readRows(a interface{}, rows []fakeRow) error {
+	type1 := reflect.TypeOf(a)
+	//value1 := reflect.ValueOf(a)
 
+	s := reflect.ValueOf(&a).Elem()
+
+	fmt.Println(a, s)
+
+	if type1 == reflect.TypeOf(article{}) {
+
+		art := a.(article)
+
+		fmt.Println(art)
+	}
 	/*
-		fs := reflect.VisibleFields(fileType)
-
-		for i, el := range fs {
-			fmt.Println(i, el.Name)
-		}
-		fmt.Println(len(fs))
-	*/
-}
-
-func readRows(str interface{}) error {
-	fileType := reflect.TypeOf(str)
-	fmt.Println(fileType)
-
-	/*
-		for rows.Next() {
+		for _, row := range rows {
 			errScan := rows.Scan(
 				&a.Pk,
 				&a.Title,
@@ -77,5 +91,17 @@ func readRows(str interface{}) error {
 		}
 	*/
 
+	// Read section titled Structs: https://go.dev/blog/laws-of-reflection
+
 	return nil
+}
+
+func unveilStruct(str interface{}) {
+	fileType := reflect.TypeOf(str)
+
+	fs := reflect.VisibleFields(fileType)
+
+	for i, el := range fs {
+		fmt.Println(i, el.Name)
+	}
 }
